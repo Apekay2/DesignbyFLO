@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Design by FLO — Atelier OS</title>
+<meta http-equiv="Content-Security-Policy"
+  content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' http://localhost:4000 http://10.0.2.2:4000; font-src 'self'; worker-src 'self' blob:">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23BF4520'/><text x='16' y='23' font-family='Georgia' font-size='19' font-style='italic' fill='%23F2EDE3' text-anchor='middle'>F</text></svg>">
+<link rel="stylesheet" href="fonts/fraunces/400.css">
+<link rel="stylesheet" href="fonts/fraunces/600.css">
+<link rel="stylesheet" href="fonts/fraunces/700.css">
+<link rel="stylesheet" href="fonts/fraunces/400-italic.css">
+<link rel="stylesheet" href="fonts/fraunces/600-italic.css">
+<link rel="stylesheet" href="fonts/archivo/400.css">
+<link rel="stylesheet" href="fonts/archivo/500.css">
+<link rel="stylesheet" href="fonts/archivo/600.css">
+<link rel="stylesheet" href="fonts/ibm-plex-mono/400.css">
+<link rel="stylesheet" href="fonts/ibm-plex-mono/500.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header id="topbar">
+  <div class="brand"><span class="tag">ATELIER OS · v0.1</span><span class="name">Design by <em>FLO</em></span></div>
+  <div id="statusLine"></div>
+  <div class="tb-actions">
+    <button class="btn" id="btnTech"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10m0 0l-4-4m4 4l4-4M5 19h14"/></svg><span>Tech pack</span></button>
+    <button class="btn btn-acc" id="btnScan"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8.5 7l1.5-3h4l1.5 3"/><circle cx="12" cy="13.2" r="3.4"/></svg><span>Scan client</span></button>
+  </div>
+</header>
+
+<main>
+  <nav id="rail"></nav>
+  <section id="stage">
+    <div id="labels"></div>
+    <div class="vp-ui" id="viewPills"></div>
+    <div class="vp-ui vp-tr">
+      <button class="icon-btn on" id="spinBtn" title="Turntable"></button>
+      <button class="icon-btn on" id="ringsBtn" title="Tailor's tapes"></button>
+    </div>
+    <div class="vp-ui hint">DRAG · ROTATE &nbsp;&nbsp; SCROLL · ZOOM</div>
+    <div class="vp-ui" id="bodyChip"></div>
+  </section>
+  <aside id="panel"></aside>
+</main>
+
+<div id="toasts"></div>
+
+<!-- FLO Fit Agent — consent-gated, on-device -->
+<div class="modal" id="scanModal" data-step="1">
+  <div class="card">
+    <header>
+      <h3>FLO <em>Fit Agent</em></h3>
+      <div class="steps mono"><span data-st="1">01 CALIBRATE</span><span data-st="2">02 CAPTURE</span><span data-st="3">03 APPLY</span></div>
+      <button class="icon-btn" id="scanClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </header>
+    <div class="body">
+      <div class="step" data-step="1">
+        <p class="sub">Estimates client measurements from a short full-body capture. Every frame is analysed on this device and discarded — nothing is stored or uploaded.</p>
+        <ol class="list mono">
+          <li>Close-fitting clothes, good light</li>
+          <li>Stand 2–3 m back, whole body in frame, feet visible</li>
+          <li>Square to the camera, arms relaxed</li>
+        </ol>
+        <div class="field"><label>Client height — cm</label><input type="number" id="scanHeight" value="170" min="120" max="220"></div>
+        <label class="consent">
+          <input type="checkbox" id="consentBox">
+          <span>I confirm my client has consented to on-device body measurement. Frames are analysed locally and are never stored or uploaded.</span>
+        </label>
+        <p class="mono consent-stamp" id="consentStamp"></p>
+        <div class="row-btns">
+          <button class="btn btn-acc" id="scanStart" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8.5 7l1.5-3h4l1.5 3"/><circle cx="12" cy="13.2" r="3.4"/></svg>Start camera</button>
+          <button class="btn" id="scanManual">Enter manually</button>
+        </div>
+        <p class="err mono" id="scanMsg"></p>
+      </div>
+      <div class="step" data-step="2">
+        <div class="camwrap"><video id="scanVideo" autoplay muted playsinline></video><canvas id="scanCanvas"></canvas></div>
+        <div class="scanbar"><i id="scanBar"></i></div>
+        <div class="scanmeta mono"><span id="scanStatus">Starting camera…</span><button class="btn tiny" id="scanCancel">Cancel</button></div>
+      </div>
+      <div class="step" data-step="3">
+        <div id="scanRes"></div>
+        <p class="sub" id="scanConf" style="margin-top:12px"></p>
+        <div class="row-btns">
+          <button class="btn btn-acc" id="scanApply">Apply to form</button>
+          <button class="btn" id="scanRetake">Retake</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Tech pack -->
+<div class="modal" id="techModal">
+  <div class="card">
+    <header><h3>Tech <em>pack</em></h3><button class="icon-btn" id="techClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></header>
+    <pre class="mono" id="techPre"></pre>
+    <div class="body"><div class="row-btns">
+      <button class="btn" id="techDl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v10m0 0l-4-4m4 4l4-4M5 19h14"/></svg>Download .txt</button>
+      <button class="btn" id="techCopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="1.5"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4H5.5A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/></svg>Copy</button>
+    </div></div>
+  </div>
+</div>
+
+<script src="boot.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "appId": "com.FLODesign",
+  "appName": "Design by FLO",
+  "webDir": "www",
+  "android": { "allowMixedContent": true },
+  "ios": { "limitsNavigationsToAppDomain": true }
+}
