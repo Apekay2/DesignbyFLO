@@ -27,7 +27,7 @@
     "three": "0.160.0"
   },
   "devDependencies": {
-    "@capacitor/cli": "^6.2.2",
+    "@capacitor/cli": "^8.6.0",
     "concurrently": "^10.0.5",
     "serve": "^14.2.0"
   }
